@@ -1,0 +1,13 @@
+version: 3
+
+silent: true
+
+vars:
+  DAY: 1
+
+tasks:
+  default:
+    dir: "{{.LATEX_HOME_DIR}}"
+    cmds:
+      - yarn build > /dev/null
+      - node ./dist/day{{.DAY}}/index.js
