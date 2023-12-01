@@ -263,6 +263,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@kaiiy/advent-of-code-2023@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@kaiiy/advent-of-code-2023@workspace:."
+  dependencies:
+    "@biomejs/biome": "npm:^1.4.1"
+    "@tsconfig/recommended": "npm:^1.0.3"
+    "@types/node": "npm:^20.10.1"
+    console-log-colors: "npm:^0.4.0"
+    esbuild: "npm:^0.19.8"
+    ts-node: "npm:^10.9.1"
+    typescript: "npm:^5.3.2"
+  languageName: unknown
+  linkType: soft
+
 "@tsconfig/node10@npm:^1.0.7":
   version: 1.0.9
   resolution: "@tsconfig/node10@npm:1.0.9"
@@ -506,20 +520,6 @@ __metadata:
   checksum: bdc36fb8095d3b41df197f5fb6f11e3a26adf4059df3213e3baa93810d8f0cc76f9a74aaefc18b73e91fe7e19154ed6f134eda6fded2e0f1c8d2272ed2d2d391
   languageName: node
   linkType: hard
-
-"yarn-ts-template@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "yarn-ts-template@workspace:."
-  dependencies:
-    "@biomejs/biome": "npm:^1.4.1"
-    "@tsconfig/recommended": "npm:^1.0.3"
-    "@types/node": "npm:^20.10.1"
-    console-log-colors: "npm:^0.4.0"
-    esbuild: "npm:^0.19.8"
-    ts-node: "npm:^10.9.1"
-    typescript: "npm:^5.3.2"
-  languageName: unknown
-  linkType: soft
 
 "yn@npm:3.1.1":
   version: 3.1.1

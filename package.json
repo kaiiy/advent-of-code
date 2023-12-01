@@ -1,5 +1,5 @@
 {
-  "name": "yarn-ts-template",
+  "name": "@kaiiy/advent-of-code-2023",
   "scripts": {
     "build": "rm -rf dist && yarn ts-node ./bin/build.ts",
     "format": "biome format --write ./src",

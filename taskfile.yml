@@ -7,7 +7,7 @@ vars:
 
 tasks:
   default:
-    dir: "{{.LATEX_HOME_DIR}}"
     cmds:
       - yarn build > /dev/null
+      - cp -f ./src/**/*.txt ./dist/day{{.DAY}}/
       - node ./dist/day{{.DAY}}/index.js

@@ -3,12 +3,12 @@ import { green } from "console-log-colors";
 
 const options: BuildOptions = {
   entryPoints: ["./src/**/index.ts"],
-  minify: true,
+  minify: false,
   bundle: true,
   outdir: "./dist",
   target: "node20",
   platform: "node",
-  format: "esm",
+  format: "cjs",
   sourcemap: false,
 };
 
