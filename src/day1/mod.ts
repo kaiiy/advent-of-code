@@ -121,7 +121,7 @@ const solvePart2 = (input: string): number => {
 
 const main = async () => {
   const input = await Deno.readTextFile(
-    `${new URL(".", import.meta.url).pathname}/input.txt`,
+    new URL("input.txt", import.meta.url).pathname,
   );
   const answerPart1 = solvePart1(input);
   const answerPart2 = solvePart2(input);
