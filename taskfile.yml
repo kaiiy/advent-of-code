@@ -8,6 +8,5 @@ vars:
 tasks:
   default:
     cmds:
-      - yarn build > /dev/null
-      - cp -f ./src/**/*.txt ./dist/day{{.DAY}}/
-      - node ./dist/day{{.DAY}}/index.js
+      - echo "** Day{{.DAY}} **"
+      - deno run --allow-read --allow-write ./src/day{{.DAY}}/index.ts
