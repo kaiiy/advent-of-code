@@ -1,3 +1,5 @@
+// https://adventofcode.com/2023/day/1
+
 const solvePart1 = (input: string): number => {
   const answer = input
     .split("\n")

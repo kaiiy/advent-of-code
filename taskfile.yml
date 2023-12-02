@@ -3,10 +3,10 @@ version: 3
 silent: true
 
 vars:
-  DAY: 1
+  DAY: 2
 
 tasks:
   default:
     cmds:
       - echo "** Day{{.DAY}} **"
-      - deno run --allow-read --allow-write ./src/day{{.DAY}}/index.ts
+      - deno run --allow-read --allow-write ./src/day{{.DAY}}/mod.ts
