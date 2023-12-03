@@ -212,7 +212,7 @@ const solvePart2 = (board: Board): number => {
 
 const main = async () => {
   const input = await Deno.readTextFile(
-    new URL("input.txt", import.meta.url).pathname,
+    new URL(import.meta.resolve("./input.txt")),
   );
 
   const board = parseBoard(input);
@@ -224,6 +224,8 @@ const main = async () => {
   console.log(`Part 2: ${answerPart2}`);
 };
 
-main();
+if (import.meta.main) {
+  await main();
+}
 
 export { parseBoard, solvePart1, solvePart2 };

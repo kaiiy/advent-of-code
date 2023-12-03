@@ -2,7 +2,7 @@ import { assertEquals } from "https://deno.land/std@0.208.0/assert/mod.ts";
 import { parseBoard, solvePart1, solvePart2 } from "./mod.ts";
 
 const input = await Deno.readTextFile(
-  new URL("sample.txt", import.meta.url).pathname,
+  new URL(import.meta.resolve("./sample.txt")),
 );
 
 const board = parseBoard(input);

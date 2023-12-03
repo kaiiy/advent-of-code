@@ -12,5 +12,4 @@ tasks:
       - deno run --allow-read --allow-write ./src/day{{.DAY}}/mod.ts
   test:
     cmds:
-      - echo "** Day{{.DAY}} **"
       - deno test --allow-read
