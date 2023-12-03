@@ -28,6 +28,13 @@ const solvePart1 = (input: string): number => {
   return answer;
 };
 
+interface Num {
+  index: number;
+  lastIndex: number;
+  length: number;
+  name: number;
+}
+
 const NUMS = [
   {
     name: 1,
@@ -80,7 +87,7 @@ const solvePart2 = (input: string): number => {
   const answer = input
     .split("\n")
     .map((str: string) => {
-      const indexArr = [];
+      const indexArr: Num[] = [];
       for (const num of NUMS) {
         const reg = num.reg;
         const matched = str.matchAll(reg);
