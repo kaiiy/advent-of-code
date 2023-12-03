@@ -1,3 +1,6 @@
 # Advent of Code 2023
 
-`task`
+```sh
+$ task
+$ task test
+```

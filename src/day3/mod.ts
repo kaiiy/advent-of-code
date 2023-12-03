@@ -225,3 +225,5 @@ const main = async () => {
 };
 
 main();
+
+export { parseBoard, solvePart1, solvePart2 };
