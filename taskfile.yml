@@ -7,9 +7,13 @@ vars:
 
 tasks:
   default:
-    cmds:
-      - echo "** Day{{.DAY}} **"
-      - deno run --allow-read --allow-write ./src/day{{.DAY}}/mod.ts
+    - echo "** Day{{.DAY}} **"
+    - deno run --allow-read ./src/day{{.DAY}}/mod.ts
   test:
-    cmds:
-      - deno test --allow-read
+    - deno test --allow-read
+  _args:
+    - echo "** Day{{.CLI_ARGS}} **"
+    - deno run --allow-read --allow-write ./src/day{{.CLI_ARGS}}/mod.ts
+  all:
+    - echo -e "==== Advent of Code 2023 ====\n"
+    - bash -c 'for i in {1..{{.DAY}}}; do task _args -- $i; echo ""; done'

@@ -1,20 +1,12 @@
 import { assertEquals } from "https://deno.land/std@0.208.0/assert/mod.ts";
-import { parseCards, solvePart1, solvePart2 } from "./mod.ts";
+import { solve } from "./mod.ts";
 
-const input = await Deno.readTextFile(
-  new URL(import.meta.resolve("./sample.txt")),
-);
-
-const cards = parseCards(input);
+const [part1, part2] = await solve("./sample.txt");
 
 Deno.test("part1", () => {
-  const actual = solvePart1(cards);
-  const expected = 13;
-  assertEquals(actual, expected);
+  assertEquals(part1, 13);
 });
 
-Deno.test("part1", () => {
-  const actual = solvePart2(cards);
-  const expected = 30;
-  assertEquals(actual, expected);
+Deno.test("part2", () => {
+  assertEquals(part2, 30);
 });

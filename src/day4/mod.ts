@@ -6,6 +6,14 @@ interface Card {
   readonly having: number[];
 }
 
+interface MatchedCard extends Card {
+  readonly matched: number;
+}
+
+interface CardWithNum extends MatchedCard {
+  num: number;
+}
+
 const parseCards = (input: string): Card[] => {
   const cardLines = input.split("\n");
   return cardLines.map((line) => {
@@ -19,32 +27,65 @@ const parseCards = (input: string): Card[] => {
   });
 };
 
-const solvePart1 = (cards: Readonly<Card[]>): number => {
-  return cards.map((card) => {
-    const { winning, having } = card;
-    const _set = new Set(having);
-    const common = new Set(winning.filter((value) => _set.has(value)));
-    const cnt = common.size;
-    if (cnt <= 0) {
-      return 0;
+const setMatched = (card: Readonly<Card>): MatchedCard => {
+  const { winning, having } = card;
+  const _set = new Set(having);
+  const common = new Set(winning.filter((value) => _set.has(value)));
+  const matched = common.size;
+  return { ...card, matched };
+};
+
+const setNums = (cards: Readonly<MatchedCard[]>): CardWithNum[] => {
+  const _cards: CardWithNum[] = cards.map((card) => ({ ...card, num: 1 }));
+
+  for (const card of cards) {
+    const { matched } = card;
+    if (matched === 0) {
+      continue;
+    } else {
+      const { matched } = card;
+      for (let i = 0; i < matched; i++) {
+        _cards[i + card.id].num += _cards[card.id - 1].num;
+      }
     }
-    return 2 ** (cnt - 1);
-  }).reduce((a, b) => a + b, 0);
+  }
+
+  return _cards;
 };
 
-const solvePart2 = (cards: Readonly<Card[]>): number => {
-  return 0;
+const solvePart1 = (matchedCards: Readonly<MatchedCard[]>): number => {
+  return matchedCards.map((card) => card.matched).reduce(
+    (a, b) => {
+      if (b === 0) {
+        return a;
+      }
+      return a + 2 ** (b - 1);
+    },
+    0,
+  );
 };
 
-const main = async () => {
+const solvePart2 = (cards: Readonly<CardWithNum[]>): number => {
+  return cards.map((card) => card.num).reduce((a, b) => a + b, 0);
+};
+
+const solve = async (file: string): Promise<[number, number]> => {
   const input = await Deno.readTextFile(
-    new URL(import.meta.resolve("./input.txt")),
+    new URL(import.meta.resolve(file)),
   );
 
   const cards = parseCards(input);
-  // console.log(cards.slice(0, 3));
-  const answerPart1 = solvePart1(cards);
-  const answerPart2 = solvePart2(cards);
+  const matchedCards = cards.map(setMatched);
+  const cardsWithNum = setNums(matchedCards);
+
+  const answerPart1 = solvePart1(matchedCards);
+  const answerPart2 = solvePart2(cardsWithNum);
+
+  return [answerPart1, answerPart2];
+};
+
+const main = async () => {
+  const [answerPart1, answerPart2] = await solve("./input.txt");
 
   console.log(`Part 1: ${answerPart1}`);
   console.log(`Part 2: ${answerPart2}`);
@@ -54,4 +95,4 @@ if (import.meta.main) {
   await main();
 }
 
-export { parseCards, solvePart1, solvePart2 };
+export { solve };
