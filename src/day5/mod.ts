@@ -17,6 +17,22 @@ interface Almanac {
   readonly maps: AlmanacMap[];
 }
 
+interface Section {
+  readonly start: number;
+  readonly length: number;
+}
+
+interface SectionWithNext {
+  readonly start: number;
+  readonly length: number;
+  readonly next: boolean;
+}
+
+interface AlmanacSection {
+  readonly seeds: Section[];
+  readonly maps: AlmanacMap[];
+}
+
 const parseAlmanac: (input: string) => Almanac = (input) => {
   const lines = input.split("\n").map((line) => line.trim()).filter((line) =>
     line.length > 0
@@ -62,6 +78,105 @@ const mapNum = (num: number, numMaps: Readonly<NumMap[]>): number => {
   return _num;
 };
 
+const divideSection = (
+  section: Section,
+  numMap: Readonly<NumMap>,
+): SectionWithNext[] => {
+  const sectionStart = section.start;
+  const sectionEnd = section.start + section.length - 1;
+  const numMapStart = numMap.src;
+  const numMapEnd = numMap.src + numMap.range - 1;
+  if (numMapStart <= sectionStart && sectionEnd <= numMapEnd) {
+    return [{
+      start: mapNum(sectionStart, [numMap]),
+      length: section.length,
+      next: false,
+    }];
+  } else if (sectionEnd < numMapStart || numMapEnd < sectionStart) {
+    return [{
+      ...section,
+      next: true,
+    }];
+  } else if (sectionStart < numMapStart && numMapEnd < sectionEnd) {
+    return [
+      {
+        start: sectionStart,
+        length: numMapStart - sectionStart + 1,
+        next: true,
+      },
+      {
+        start: mapNum(numMapStart, [numMap]),
+        length: numMap.range - 1,
+        next: false,
+      },
+      {
+        start: numMapEnd + 1,
+        length: sectionEnd - numMapEnd,
+        next: true,
+      },
+    ];
+  } else {
+    if (sectionStart < numMapStart) {
+      return [
+        {
+          start: sectionStart,
+          length: numMapStart - sectionStart + 1,
+          next: true,
+        },
+        {
+          start: mapNum(numMapStart, [numMap]),
+          length: sectionEnd - numMapStart,
+          next: false,
+        },
+      ];
+    } else {
+      return [
+        {
+          start: mapNum(sectionStart, [numMap]),
+          length: numMapEnd - sectionStart + 1,
+          next: false,
+        },
+        {
+          start: numMapEnd + 1,
+          length: sectionEnd - numMapEnd,
+          next: true,
+        },
+      ];
+    }
+  }
+};
+
+const mapSection = (
+  section: Section,
+  numMaps: Readonly<NumMap[]>,
+): Section[] => {
+  const sections: Section[] = [section];
+  const finished: Section[] = [];
+  for (const numMap of numMaps) {
+    for (const section of sections) {
+      const dividedSections = divideSection(section, numMap);
+      console.log(dividedSections);
+      finished.push(...dividedSections.filter((section) => !section.next));
+      sections.push(...dividedSections.filter((section) => section.next));
+    }
+  }
+  finished.push(...sections);
+  return finished;
+};
+
+const convertAlmanacSection = (almanac: Almanac): AlmanacSection => {
+  const length = Math.floor(almanac.seeds.length / 2);
+  const seeds: Section[] = [];
+  for (let i = 0; i < length; i++) {
+    seeds.push({
+      start: almanac.seeds[i * 2],
+      length: almanac.seeds[i * 2 + 1],
+    });
+  }
+  const maps = almanac.maps;
+  return { seeds, maps };
+};
+
 const solvePart1 = (almanac: Readonly<Almanac>): number => {
   const START_KEY = "seed";
   const END_KEY = "location";
@@ -88,8 +203,32 @@ const solvePart1 = (almanac: Readonly<Almanac>): number => {
   return Math.min(...nums);
 };
 
-const solvePart2 = (): number => {
-  return 0;
+const solvePart2 = (almanacSection: AlmanacSection): number => {
+  const START_KEY = "seed";
+  const END_KEY = "soil";
+
+  let currSrc = START_KEY;
+  let currDst = "";
+
+  let sections = almanacSection.seeds;
+  const nextSections: Section[] = [];
+  const maps = almanacSection.maps;
+
+  while (currDst !== END_KEY) {
+    const map = maps.find((map) => map.src === currSrc);
+    if (!map) {
+      throw new Error(`No map found for ${currSrc}`);
+    }
+    const numMaps = map.numMaps;
+    sections.forEach((section) => {
+      nextSections.push(...mapSection(section, numMaps));
+    });
+    sections = nextSections;
+    currDst = map.dst;
+    currSrc = currDst;
+  }
+
+  return Math.min(...sections.map((section) => section.start));
 };
 
 const solve = async (file: string): Promise<[number, number]> => {
@@ -98,15 +237,17 @@ const solve = async (file: string): Promise<[number, number]> => {
   );
 
   const almanac = parseAlmanac(input);
+  const almanacSection = convertAlmanacSection(almanac);
+  console.log(almanacSection);
 
   const answerPart1 = solvePart1(almanac);
-  const answerPart2 = solvePart2();
+  const answerPart2 = solvePart2(almanacSection);
 
   return [answerPart1, answerPart2];
 };
 
 const main = async () => {
-  const [answerPart1, answerPart2] = await solve("./input.txt");
+  const [answerPart1, answerPart2] = await solve("./sample.txt");
 
   console.log(`Part 1: ${answerPart1}`);
   console.log(`Part 2: ${answerPart2}`);
