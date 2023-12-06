@@ -22,9 +22,7 @@ interface Section {
   readonly length: number;
 }
 
-interface SectionWithNext {
-  readonly start: number;
-  readonly length: number;
+interface SectionWithNext extends Section {
   readonly next: boolean;
 }
 
@@ -150,18 +148,23 @@ const mapSection = (
   section: Section,
   numMaps: Readonly<NumMap[]>,
 ): Section[] => {
-  const sections: Section[] = [section];
-  const finished: Section[] = [];
+  let sections: SectionWithNext[] = [];
+  let nextSections: SectionWithNext[] = [{ ...section, next: true }];
+  const finished: SectionWithNext[] = [];
   for (const numMap of numMaps) {
+    sections = nextSections;
+    nextSections = [];
     for (const section of sections) {
       const dividedSections = divideSection(section, numMap);
-      console.log(dividedSections);
       finished.push(...dividedSections.filter((section) => !section.next));
-      sections.push(...dividedSections.filter((section) => section.next));
+      nextSections.push(...dividedSections.filter((section) => section.next));
     }
   }
-  finished.push(...sections);
-  return finished;
+  finished.push(...nextSections);
+  return finished.filter((section) => section.length > 0).map((section) => ({
+    start: section.start,
+    length: section.length,
+  }));
 };
 
 const convertAlmanacSection = (almanac: Almanac): AlmanacSection => {
@@ -205,13 +208,13 @@ const solvePart1 = (almanac: Readonly<Almanac>): number => {
 
 const solvePart2 = (almanacSection: AlmanacSection): number => {
   const START_KEY = "seed";
-  const END_KEY = "soil";
+  const END_KEY = "location";
 
   let currSrc = START_KEY;
   let currDst = "";
 
   let sections = almanacSection.seeds;
-  const nextSections: Section[] = [];
+  let nextSections: Section[] = [];
   const maps = almanacSection.maps;
 
   while (currDst !== END_KEY) {
@@ -223,7 +226,9 @@ const solvePart2 = (almanacSection: AlmanacSection): number => {
     sections.forEach((section) => {
       nextSections.push(...mapSection(section, numMaps));
     });
+
     sections = nextSections;
+    nextSections = [];
     currDst = map.dst;
     currSrc = currDst;
   }
@@ -238,7 +243,6 @@ const solve = async (file: string): Promise<[number, number]> => {
 
   const almanac = parseAlmanac(input);
   const almanacSection = convertAlmanacSection(almanac);
-  console.log(almanacSection);
 
   const answerPart1 = solvePart1(almanac);
   const answerPart2 = solvePart2(almanacSection);
@@ -247,7 +251,7 @@ const solve = async (file: string): Promise<[number, number]> => {
 };
 
 const main = async () => {
-  const [answerPart1, answerPart2] = await solve("./sample.txt");
+  const [answerPart1, answerPart2] = await solve("./input.txt");
 
   console.log(`Part 1: ${answerPart1}`);
   console.log(`Part 2: ${answerPart2}`);
