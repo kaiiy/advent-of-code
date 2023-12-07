@@ -4,7 +4,7 @@ import { solve } from "./mod.ts";
 const [part1, part2] = await solve("./sample.txt");
 
 Deno.test("part1", () => {
-  assertEquals(part1, 0);
+  assertEquals(part1, 288);
 });
 
 Deno.test("part2", () => {
