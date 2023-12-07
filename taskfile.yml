@@ -17,3 +17,7 @@ tasks:
   all:
     - echo -e "==== Advent of Code 2023 ====\n"
     - bash -c 'for i in {1..{{.DAY}}}; do task _args -- $i; echo ""; done'
+  day:
+    - echo "** Hello, Day{{.DAY}} **"
+    - mkdir -p ./src/day{{.DAY}}
+    - cp -n ./src/template/* ./src/day{{.DAY}}/
