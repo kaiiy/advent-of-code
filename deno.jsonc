@@ -1,0 +1,7 @@
+{
+    "test": {
+        "exclude": [
+            "./src/template/"
+        ]
+    }
+}
