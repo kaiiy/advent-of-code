@@ -1,4 +1,5 @@
 import {
+  compareHands,
   isFiveOfAKind,
   isFourOfAKind,
   isFullHouse,
@@ -24,6 +25,32 @@ const CARDS = [
   "2",
 ] as const;
 
+const CARD_RANK = {
+  A: 12,
+  K: 11,
+  Q: 10,
+  J: 9,
+  T: 8,
+  "9": 7,
+  "8": 6,
+  "7": 5,
+  "6": 4,
+  "5": 3,
+  "4": 2,
+  "3": 1,
+  "2": 0,
+} as const;
+
+const TYPE_RANK = {
+  "Five of a Kind": 6,
+  "Four of a Kind": 5,
+  "Full House": 4,
+  "Three of a Kind": 3,
+  "Two Pair": 2,
+  "One Pair": 1,
+  "High Card": 0,
+};
+
 type Card = typeof CARDS[number];
 
 type Type =
@@ -38,14 +65,14 @@ type Type =
 interface HandBase {
   readonly cards: [Card, Card, Card, Card, Card];
   readonly bit: number;
+  num: {
+    [key in Card]: number;
+  };
 }
 
 interface Hand extends HandBase {
   type: Type;
   rank: number;
-  num: {
-    [key in Card]: number;
-  };
 }
 
 const parseHandBases = (input: string): HandBase[] => {
@@ -58,7 +85,7 @@ const parseHandBases = (input: string): HandBase[] => {
     return false;
   };
 
-  return input.split("\n").map((hand) => {
+  const _hands: HandBase[] = input.split("\n").map((hand) => {
     const split = hand.split(/\s+/);
     const _cards = split[0].split("");
 
@@ -75,37 +102,36 @@ const parseHandBases = (input: string): HandBase[] => {
         Card,
       ],
       bit: Number.parseInt(split[1]),
+      num: {
+        A: 0,
+        K: 0,
+        Q: 0,
+        J: 0,
+        T: 0,
+        "9": 0,
+        "8": 0,
+        "7": 0,
+        "6": 0,
+        "5": 0,
+        "4": 0,
+        "3": 0,
+        "2": 0,
+      },
     };
   });
+
+  const hands = _hands.map(setHandNums);
+  return hands;
 };
 
-const setHandNums = (hand: Readonly<HandBase>): Hand => {
-  const num: { [key in Card]: number } = {
-    A: 0,
-    K: 0,
-    Q: 0,
-    J: 0,
-    T: 0,
-    "9": 0,
-    "8": 0,
-    "7": 0,
-    "6": 0,
-    "5": 0,
-    "4": 0,
-    "3": 0,
-    "2": 0,
-  };
+const setHandNums = (hand: Readonly<HandBase>): HandBase => {
+  const _hand = { ...hand };
 
-  for (const card of hand.cards) {
-    num[card] += 1;
+  for (const card of _hand.cards) {
+    _hand.num[card] += 1;
   }
 
-  return {
-    ...hand,
-    type: "High Card",
-    rank: -1,
-    num,
-  };
+  return _hand;
 };
 
 const setHandType = (hand: Readonly<Hand>): Hand => {
@@ -161,20 +187,52 @@ const setHandType = (hand: Readonly<Hand>): Hand => {
   }
 };
 
-const extendHands = (hands: Readonly<HandBase[]>): Hand[] => {
-  // set nums
-  const _handsNums = hands.map(setHandNums);
-  // set types
-  const _hands = _handsNums.map(setHandType);
+const setHandsRank = (hands: Readonly<Hand[]>): Hand[] => {
+  const _hands = hands.toSorted((a, b) => compareHands(a, b));
+
+  for (let i = 0; i < _hands.length; i++) {
+    _hands[i].rank = i + 1;
+  }
 
   return _hands;
 };
 
-const parseHands = (input: string): Hand[] => {
-  const handBases = parseHandBases(input);
-  const hands = extendHands(handBases);
+const extendHandsPart1 = (hands: Readonly<HandBase[]>): Hand[] => {
+  const _hands: Hand[] = hands.map((hand) => ({
+    ...hand,
+    type: "High Card",
+    rank: -1,
+  }));
+  // set types
+  const handsTypes = _hands.map(setHandType);
+  // set ranks
+  const handsRanks = setHandsRank(handsTypes);
 
-  return hands;
+  return handsRanks;
 };
 
-export { CARDS, type Hand, parseHands };
+// TODO: JOKER拡張
+const extendHandsPart2 = (hands: Readonly<HandBase[]>): Hand[] => {
+  const _hands: Hand[] = hands.map((hand) => ({
+    ...hand,
+    type: "High Card",
+    rank: -1,
+  }));
+  // set types
+  const handsTypes = _hands.map(setHandType);
+  // set ranks
+  const handsRanks = setHandsRank(handsTypes);
+
+  return handsRanks;
+};
+
+export {
+  CARD_RANK,
+  CARDS,
+  extendHandsPart1,
+  extendHandsPart2,
+  type Hand,
+  type HandBase,
+  parseHandBases,
+  TYPE_RANK,
+};
