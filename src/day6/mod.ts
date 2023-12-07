@@ -29,26 +29,37 @@ const parseRaces = (input: string): Race[] => {
   return races;
 };
 
+const convertRace = (races: Race[]) => {
+  const [time, distance] = races.reduce((a, b) => {
+    return [a[0] + b.time, a[1] + b.distance];
+  }, ["", ""]).map((v) => Number(v));
+  return { time, distance };
+};
+
+const calcWays = (race: Race) => {
+  const c = race.time ** 2 - 4 * race.distance;
+  assert(c > 0);
+
+  const min = Math.ceil((race.time - Math.sqrt(c)) / 2);
+  const max = Math.floor((race.time + Math.sqrt(c)) / 2);
+
+  let ways = max - min + 1;
+  for (const m of [min, max]) {
+    if ((race.time - m) * m === race.distance) {
+      ways--;
+    }
+  }
+  return ways;
+};
+
 const solvePart1 = (races: Race[]): number => {
   return races.map((race) => {
-    const c = race.time ** 2 - 4 * race.distance;
-    assert(c > 0);
-
-    const min = Math.ceil((race.time - Math.sqrt(c)) / 2);
-    const max = Math.floor((race.time + Math.sqrt(c)) / 2);
-
-    let ways = max - min + 1;
-    for (const m of [min, max]) {
-      if ((race.time - m) * m === race.distance) {
-        ways--;
-      }
-    }
-    return ways;
+    return calcWays(race);
   }).reduce((a, b) => a * b, 1);
 };
 
-const solvePart2 = (): number => {
-  return 0;
+const solvePart2 = (race: Race): number => {
+  return calcWays(race);
 };
 
 const solve = async (file: string): Promise<[number, number]> => {
@@ -57,9 +68,10 @@ const solve = async (file: string): Promise<[number, number]> => {
   );
 
   const races = parseRaces(input);
+  const race = convertRace(races);
 
   const answerPart1 = solvePart1(races);
-  const answerPart2 = solvePart2();
+  const answerPart2 = solvePart2(race);
 
   return [answerPart1, answerPart2];
 };
@@ -69,10 +81,6 @@ const main = async () => {
 
   console.log(`Part 1: ${answerPart1}`);
   console.log(`Part 2: ${answerPart2}`);
-
-  // memo: (time-x) * x > distance
-  // tx - x^2 > d
-  // x^2 - tx + d < 0
 };
 
 if (import.meta.main) {
