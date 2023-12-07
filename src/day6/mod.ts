@@ -1,4 +1,4 @@
-// https://adventofcode.com/2023/day/5
+// https://adventofcode.com/2023/day/6
 
 import { assert } from "https://deno.land/std@0.208.0/assert/assert.ts";
 
