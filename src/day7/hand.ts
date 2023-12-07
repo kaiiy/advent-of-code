@@ -162,7 +162,7 @@ const extendHandsPart1 = (hands: Readonly<HandBase[]>): Hand[] => {
   // set types
   const handsTypes = _hands.map((hand) => setHandType(hand, false));
   // set ranks
-  const handsRanks = setHandsRank(handsTypes);
+  const handsRanks = setHandsRank(handsTypes, false);
 
   return handsRanks;
 };
