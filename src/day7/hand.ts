@@ -1,5 +1,4 @@
 import {
-  compareHands,
   isFiveOfAKind,
   isFourOfAKind,
   isFullHouse,
@@ -8,72 +7,9 @@ import {
   isThreeOfAKind,
   isTwoPair,
 } from "./type.ts";
+import { compareHands } from "./compare.ts";
 
-const CARDS = [
-  "A",
-  "K",
-  "Q",
-  "J",
-  "T",
-  "9",
-  "8",
-  "7",
-  "6",
-  "5",
-  "4",
-  "3",
-  "2",
-] as const;
-
-const CARD_RANK = {
-  A: 12,
-  K: 11,
-  Q: 10,
-  J: 9,
-  T: 8,
-  "9": 7,
-  "8": 6,
-  "7": 5,
-  "6": 4,
-  "5": 3,
-  "4": 2,
-  "3": 1,
-  "2": 0,
-} as const;
-
-const TYPE_RANK = {
-  "Five of a Kind": 6,
-  "Four of a Kind": 5,
-  "Full House": 4,
-  "Three of a Kind": 3,
-  "Two Pair": 2,
-  "One Pair": 1,
-  "High Card": 0,
-};
-
-type Card = typeof CARDS[number];
-
-type Type =
-  | "Five of a Kind"
-  | "Four of a Kind"
-  | "Full House"
-  | "Three of a Kind"
-  | "Two Pair"
-  | "One Pair"
-  | "High Card";
-
-interface HandBase {
-  readonly cards: [Card, Card, Card, Card, Card];
-  readonly bit: number;
-  num: {
-    [key in Card]: number;
-  };
-}
-
-interface Hand extends HandBase {
-  type: Type;
-  rank: number;
-}
+import { type Card, CARDS, type Hand, type HandBase } from "./const.ts";
 
 const parseHandBases = (input: string): HandBase[] => {
   const isValidCard = (card: string): card is Card => {
@@ -134,50 +70,70 @@ const setHandNums = (hand: Readonly<HandBase>): HandBase => {
   return _hand;
 };
 
-const setHandType = (hand: Readonly<Hand>): Hand => {
-  if (isFiveOfAKind(hand)) {
+const setHandType = (hand: Readonly<Hand>, joker = false): Hand => {
+  const _hand = { ...hand };
+  if (joker && _hand.num["J"] > 0) {
+    let maxKey: Card = "A";
+    let maxVal = 0;
+
+    for (const [key, val] of Object.entries(_hand.num)) {
+      if (key === "J") {
+        continue;
+      }
+
+      if (maxVal < val) {
+        maxKey = key as Card;
+        maxVal = val;
+      }
+    }
+
+    _hand.num[maxKey] += _hand.num["J"];
+    _hand.num["J"] = 0;
+  }
+
+  if (isFiveOfAKind(_hand)) {
     return {
       ...hand,
       type: "Five of a Kind",
     };
   }
 
-  if (isFourOfAKind(hand)) {
+  if (isFourOfAKind(_hand)) {
     return {
       ...hand,
       type: "Four of a Kind",
     };
   }
 
-  if (isFullHouse(hand)) {
+  if (isFullHouse(_hand)) {
     return {
       ...hand,
       type: "Full House",
     };
   }
 
-  if (isThreeOfAKind(hand)) {
+  if (isThreeOfAKind(_hand)) {
     return {
       ...hand,
       type: "Three of a Kind",
     };
   }
 
-  if (isTwoPair(hand)) {
+  if (isTwoPair(_hand)) {
     return {
       ...hand,
       type: "Two Pair",
     };
   }
 
-  if (isOnePair(hand)) {
+  if (isOnePair(_hand)) {
     return {
       ...hand,
       type: "One Pair",
     };
   }
 
-  if (isHighCard(hand)) {
+  if (isHighCard(_hand)) {
     return {
       ...hand,
       type: "High Card",
@@ -187,8 +143,8 @@ const setHandType = (hand: Readonly<Hand>): Hand => {
   }
 };
 
-const setHandsRank = (hands: Readonly<Hand[]>): Hand[] => {
-  const _hands = hands.toSorted((a, b) => compareHands(a, b));
+const setHandsRank = (hands: Readonly<Hand[]>, joker = false): Hand[] => {
+  const _hands = hands.toSorted((a, b) => compareHands(a, b, joker));
 
   for (let i = 0; i < _hands.length; i++) {
     _hands[i].rank = i + 1;
@@ -204,14 +160,13 @@ const extendHandsPart1 = (hands: Readonly<HandBase[]>): Hand[] => {
     rank: -1,
   }));
   // set types
-  const handsTypes = _hands.map(setHandType);
+  const handsTypes = _hands.map((hand) => setHandType(hand, false));
   // set ranks
   const handsRanks = setHandsRank(handsTypes);
 
   return handsRanks;
 };
 
-// TODO: JOKER拡張
 const extendHandsPart2 = (hands: Readonly<HandBase[]>): Hand[] => {
   const _hands: Hand[] = hands.map((hand) => ({
     ...hand,
@@ -219,20 +174,11 @@ const extendHandsPart2 = (hands: Readonly<HandBase[]>): Hand[] => {
     rank: -1,
   }));
   // set types
-  const handsTypes = _hands.map(setHandType);
+  const handsTypes = _hands.map((hand) => setHandType(hand, true));
   // set ranks
-  const handsRanks = setHandsRank(handsTypes);
+  const handsRanks = setHandsRank(handsTypes, true);
 
   return handsRanks;
 };
 
-export {
-  CARD_RANK,
-  CARDS,
-  extendHandsPart1,
-  extendHandsPart2,
-  type Hand,
-  type HandBase,
-  parseHandBases,
-  TYPE_RANK,
-};
+export { extendHandsPart1, extendHandsPart2, parseHandBases };

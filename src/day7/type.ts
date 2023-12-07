@@ -1,5 +1,4 @@
-import { assert } from "https://deno.land/std@0.208.0/assert/assert.ts";
-import { CARD_RANK, CARDS, type Hand, TYPE_RANK } from "./hand.ts";
+import { CARDS, type Hand } from "./const.ts";
 
 const isFiveOfAKind = (hand: Readonly<Hand>): boolean => {
   for (const card of CARDS) {
@@ -78,30 +77,7 @@ const isHighCard = (hand: Readonly<Hand>): boolean => {
   return true;
 };
 
-const compareSecondHands = (
-  hand1: Readonly<Hand>,
-  hand2: Readonly<Hand>,
-): number => {
-  assert(hand1.type === hand2.type);
-
-  for (let i = 0; i < CARDS.length; i++) {
-    if (hand1.cards[i] !== hand2.cards[i]) {
-      return CARD_RANK[hand1.cards[i]] - CARD_RANK[hand2.cards[i]];
-    }
-  }
-
-  return 0;
-};
-const compareHands = (hand1: Readonly<Hand>, hand2: Readonly<Hand>): number => {
-  if (hand1.type !== hand2.type) {
-    return TYPE_RANK[hand1.type] - TYPE_RANK[hand2.type];
-  }
-
-  return compareSecondHands(hand1, hand2);
-};
-
 export {
-  compareHands,
   isFiveOfAKind,
   isFourOfAKind,
   isFullHouse,

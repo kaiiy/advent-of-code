@@ -1,12 +1,7 @@
 // https://adventofcode.com/2023/day/7
 
-import {
-  extendHandsPart1,
-  extendHandsPart2,
-  type Hand,
-  type HandBase,
-  parseHandBases,
-} from "./hand.ts";
+import { extendHandsPart1, extendHandsPart2, parseHandBases } from "./hand.ts";
+import { type Hand, type HandBase } from "./const.ts";
 
 const solvePart1 = (
   handBases: HandBase[],
