@@ -1,4 +1,13 @@
-// https://adventofcode.com/2023/day/x
+// https://adventofcode.com/2023/day/7
+
+type LR = "L" | "R";
+
+interface Map {
+}
+
+interface Input {
+  instructions: LR[];
+}
 
 const solvePart1 = (): number => {
   return 0;
@@ -20,7 +29,7 @@ const solve = async (file: string): Promise<[number, number]> => {
 };
 
 const main = async () => {
-  const [answerPart1, answerPart2] = await solve("./input.txt");
+  const [answerPart1, answerPart2] = await solve("./sample1.txt");
 
   console.log(`Part 1: ${answerPart1}`);
   console.log(`Part 2: ${answerPart2}`);
