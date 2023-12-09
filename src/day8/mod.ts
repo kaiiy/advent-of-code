@@ -1,15 +1,43 @@
 // https://adventofcode.com/2023/day/7
 
-type LR = "L" | "R";
+type LR = "left" | "right";
 
 interface Map {
+  node: string;
+  left: string;
+  right: string;
 }
 
 interface Input {
   instructions: LR[];
+  maps: Map[];
 }
 
-const solvePart1 = (): number => {
+const parseInput = (input: string): Input => {
+  const split = input.split("\n");
+  const instructions: LR[] = split[0].trim().split("").map((x) => {
+    if (x === "L") return "left";
+    if (x === "R") return "right";
+    throw new Error("Invalid input");
+  });
+  const maps = split.slice(2).map((x) => {
+    const matched = x.trim().match(
+      /([A-Z]{3})\s+=\s+\(([A-Z]{3}),\s+([A-Z]{3})\)/,
+    );
+    if (!matched) throw new Error("Invalid input");
+    const [, node, left, right] = matched;
+    return { node, left, right };
+  });
+
+  const parsed: Input = {
+    instructions,
+    maps,
+  };
+
+  return parsed;
+};
+
+const solvePart1 = (parsed: Input): number => {
   return 0;
 };
 
@@ -22,7 +50,9 @@ const solve = async (file: string): Promise<[number, number]> => {
     new URL(import.meta.resolve(file)),
   );
 
-  const answerPart1 = solvePart1();
+  const parsed = parseInput(input);
+
+  const answerPart1 = solvePart1(parsed);
   const answerPart2 = solvePart2();
 
   return [answerPart1, answerPart2];
