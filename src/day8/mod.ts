@@ -1,6 +1,9 @@
 // https://adventofcode.com/2023/day/8
 
-type LR = "left" | "right";
+const LEFT = "left";
+const RIGHT = "right";
+
+type LR = typeof LEFT | typeof RIGHT;
 
 interface Map {
   node: string;
@@ -14,13 +17,13 @@ interface Input {
 }
 
 const parseInput = (input: string): Input => {
-  const split = input.split("\n");
-  const instructions: LR[] = split[0].trim().split("").map((x) => {
-    if (x === "L") return "left";
-    if (x === "R") return "right";
+  const lines = input.split("\n");
+  const instructions: LR[] = lines[0].trim().split("").map((x) => {
+    if (x === "L") return LEFT;
+    if (x === "R") return RIGHT;
     throw new Error("Invalid input");
   });
-  const maps = split.slice(2).map((x) => {
+  const maps = lines.slice(2).map((x) => {
     const matched = x.trim().match(
       /([A-Z]{3})\s+=\s+\(([A-Z]{3}),\s+([A-Z]{3})\)/,
     );
