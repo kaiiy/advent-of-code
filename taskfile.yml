@@ -3,7 +3,7 @@ version: 3
 silent: true
 
 vars:
-  DAY: 9
+  DAY: 10
 
 tasks:
   default:
